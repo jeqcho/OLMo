@@ -1,11 +1,11 @@
-run_name: llamaish7-dirk-baseline-normal-init-1
+run_name: llamaish7-dirk-baseline-normal-init-data-fix-1
 seed: 6198
 dry_run: false
 
 wandb:
   name: ${run_name}
   project: olmo-medium
-  group: llamaish7-dirk-baseline-normal-init
+  group: llamaish7-dirk-baseline-normal-init-data-fix
 
 model:
   d_model: 4096
@@ -152,6 +152,10 @@ data:
   prefetch_factor: 8
   persistent_workers: true
   timeout: 0
+  instance_filter:
+    repetition_max_period: 13
+    repetition_min_period: 1
+    repetition_max_count: 32
   paths:
   - s3://ai2-llm/preprocessed/olmo-mix/v1_6-decontaminated/books/gpt-neox-olmo-dolma-v1_5/part-0-00000.npy
   - s3://ai2-llm/preprocessed/olmo-mix/v1_6-decontaminated/books/gpt-neox-olmo-dolma-v1_5/part-1-00000.npy

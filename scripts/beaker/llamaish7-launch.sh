@@ -6,12 +6,12 @@ NUM_NODES=8
 
 gantry run \
   --workspace ai2/OLMo-training  \
-  --task-name llamaish7-dirk-baseline-normal-init \
-  --description "OLMO 7B with congif matching Dirks baseline and normal init" \
+  --task-name llamaish7-dirk-baseline-normal-init-data-fix \
+  --description "OLMO 7B with congif matching Dirks baseline and normal init and data-fix" \
   --priority high \
   --preemptible \
   --beaker-image shanea/olmo-torch2.2-gantry \
-  --cluster ai2/jupiter-cirrascale \
+  --cluster ai2/jupiter-cirrascale-2 \
   --gpus 8 \
   --replicas "${NUM_NODES}" \
   --leader-selection \
