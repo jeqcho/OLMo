@@ -6,12 +6,12 @@ NUM_NODES=8
 
 gantry run \
   --workspace ai2/OLMo-training \
-  --task-name llamaish1-normal \
-  --description "OLMo small - 1B - Llamaish Normal" \
+  --task-name llamaish1-dirk-baseline \
+  --description "OLMo small - 1B - Llamaish approximating the 7B Dirk baseline" \
   --priority high \
   --preemptible \
   --beaker-image shanea/olmo-torch2.2-gantry \
-  --cluster ai2/jupiter-cirrascale-2 \
+  --cluster ai2/jupiter-cirrascale \
   --gpus 8 \
   --replicas "${NUM_NODES}" \
   --leader-selection \
@@ -23,9 +23,9 @@ gantry run \
   --env LOG_FILTER_TYPE=local_rank0_only \
   --env OMP_NUM_THREADS=8 \
   --env OLMO_TASK=model \
-  --env-secret WANDB_API_KEY=AKSHITAB_WANDB_API_KEY \
-  --env-secret AWS_ACCESS_KEY_ID=AKSHITAB_AWS_ACCESS_KEY_ID \
-  --env-secret AWS_SECRET_ACCESS_KEY=AKSHITAB_AWS_SECRET_ACCESS_KEY \
+  --env-secret WANDB_API_KEY=DUSTINS_WANDB_API_KEY \
+  --env-secret AWS_ACCESS_KEY_ID=DUSTINS_AWS_ACCESS_KEY_ID \
+  --env-secret AWS_SECRET_ACCESS_KEY=DUSTINS_AWS_SECRET_ACCESS_KEY \
   --shared-memory 10GiB \
   --venv base \
   --yes \
