@@ -1,25 +1,13 @@
-import math
 from typing import Optional, Union
 
-import torch
 import torch.nn as nn
 
-from .config import InitFnType, ModelConfig
-from .util import StrEnum
-
-__all__ = ["init_weights", "ModuleType"]
+__all__ = ["init_normal"]
 
 
-class ModuleType(StrEnum):
-    in_module = "in"
-    out_module = "out"
-    emb = "emb"
-    final_out = "final_out"
-
-
-def init_weights(
-    config: ModelConfig,
+def init_normal(
     module: Union[nn.Linear, nn.Embedding],
+<<<<<<< HEAD
     d: Optional[int] = None,
     layer_id: Optional[int] = None,
     std_factor: float = 1.0,
@@ -56,6 +44,44 @@ def init_weights(
     elif config.init_fn == InitFnType.full_megatron:
         if type_of_module is None:
             raise RuntimeError(f"When using the {InitFnType.full_megatron} init, every module must have a type.")
+
+        cutoff_factor = config.init_cutoff_factor
+        if cutoff_factor is None:
+            cutoff_factor = 3
+
+        if type_of_module == ModuleType.in_module:
+            # for att_proj (same as QKV), ff_proj
+            std = config.init_std
+        elif type_of_module == ModuleType.out_module:
+            # for attn_out, ff_out
+            std = config.init_std / math.sqrt(2.0 * config.n_layers)
+        elif type_of_module == ModuleType.emb:
+            # positional embeddings (wpe)
+            # token embeddings (wte)
+            std = config.init_std * math.sqrt(config.d_model)
+        elif type_of_module == ModuleType.final_out:
+            # final output (ff_out)
+            std = config.d_model**-0.5
+        else:
+            raise RuntimeError(f"Unknown module type '{type_of_module}'")
+        nn.init.trunc_normal_(
+            module.weight,
+            mean=0.0,
+            std=std,
+            a=-cutoff_factor * std,
+            b=cutoff_factor * std,
+        )
+=======
+    std: float,
+    init_cutoff_factor: Optional[float] = None,
+):
+    # weights
+    if init_cutoff_factor is not None:
+        cutoff_value = init_cutoff_factor * std
+        nn.init.trunc_normal_(module.weight, mean=0.0, std=std, a=-cutoff_value, b=cutoff_value)
+>>>>>>> main
+    else:
+        nn.init.normal_(module.weight, mean=0.0, std=std)
 
     # biases
     if isinstance(module, nn.Linear) and module.bias is not None:

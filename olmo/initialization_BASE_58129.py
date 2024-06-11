@@ -57,6 +57,39 @@ def init_weights(
         if type_of_module is None:
             raise RuntimeError(f"When using the {InitFnType.full_megatron} init, every module must have a type.")
 
-    # biases
-    if isinstance(module, nn.Linear) and module.bias is not None:
-        nn.init.zeros_(module.bias)
+        cutoff_factor = config.init_cutoff_factor
+        if cutoff_factor is None:
+            cutoff_factor = 3
+
+        if type_of_module == ModuleType.in_module:
+            # for att_proj (same as QKV), ff_proj
+            std = config.init_std
+        elif type_of_module == ModuleType.out_module:
+            # for attn_out, ff_out
+            std = config.init_std / math.sqrt(2.0 * config.n_layers)
+        elif type_of_module == ModuleType.emb:
+            # positional embeddings (wpe)
+            # token embeddings (wte)
+            std = config.init_std
+        elif type_of_module == ModuleType.final_out:
+            # final output (ff_out)
+            std = config.d_model**-0.5
+        else:
+            raise RuntimeError(f"Unknown module type '{type_of_module}'")
+        nn.init.trunc_normal_(
+            module.weight,
+            mean=0.0,
+            std=std,
+            a=-cutoff_factor * std,
+            b=cutoff_factor * std,
+        )
+    else:
+        raise NotImplementedError(config.init_fn)
+
+    if isinstance(module, nn.Linear):
+        if module.bias is not None:
+            nn.init.zeros_(module.bias)
+
+        if config.init_fn == InitFnType.normal and getattr(module, "_is_residual", False):
+            with torch.no_grad():
+                module.weight.div_(math.sqrt(2 * config.n_layers))
