@@ -6,8 +6,8 @@ NUM_NODES=8
 
 gantry run \
   --workspace ai2/OLMo-training \
-  --task-name llamaish1-dirk-baseline-emb-init-fix \
-  --description "OLMo small - 1B - Llamaish approximating the 7B Dirk baseline with embed init fix" \
+  --task-name llamaish1-dirk-baseline-normal \
+  --description "OLMo small - 1B - Llamaish approximating the 7B Dirk baseline with normal init" \
   --priority high \
   --preemptible \
   --beaker-image shanea/olmo-torch2.2-gantry \
